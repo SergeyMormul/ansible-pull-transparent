@@ -14,7 +14,7 @@
             src: "/usr/bin/{{item}}"
             dest: "/usr/local/bin/{{item}}"
             state: link
-        with-items:
+        with_items:
             - ansible
             - ansible-console
             - ansible-doc
@@ -66,7 +66,7 @@
             state: directory
             owner: vagrant
             group: vagrant
-        with-items:
+        with_items:
             - Asgard
             - Gradle
             - Mold-E
