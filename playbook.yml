@@ -1,7 +1,7 @@
 #!/usr/bin/env ansible-playbook
 
 - name: Gather prerequisites
-  hosts: localhost
+  hosts: all
   gather_facts: True
   tasks:
     - group_by: key={{ ansible_distribution }}
@@ -14,7 +14,7 @@
             src: "/usr/bin/{{item}}"
             dest: "/usr/local/bin/{{item}}"
             state: link
-        loop:
+        with-items:
             - ansible
             - ansible-console
             - ansible-doc
@@ -24,7 +24,7 @@
             - ansible-vault
 
 - name: Update Hosts File
-  hosts: localhost
+  hosts: all
   become: True
   tasks:
       - lineinfile:
@@ -58,7 +58,7 @@
 
 
 - name: Create Source Folders
-  hosts: localhost
+  hosts: all
   become: False
   tasks:
       - file:
@@ -66,7 +66,7 @@
             state: directory
             owner: vagrant
             group: vagrant
-        loop:
+        with-items:
             - Asgard
             - Gradle
             - Mold-E
@@ -99,8 +99,8 @@
     - shell: /usr/sbin/iptables -I INPUT 1 -p tcp -s 172.17.0.0/24 -j ACCEPT
     - shell: /sbin/service iptables save
 
-- name: Install FFMpeg
-  hosts: none
+- name: Docker Registry Credentials (unprivileged
+  hosts: all
   become: True
   tasks:
       - get_url:
@@ -121,4 +121,15 @@
         get_url:
           url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
           dest: "/home/vagrant/.dockercfg"
+          
+- name: Set Home Folder Permissions (must be last play)
+  hosts: all
+  become: True
+  tasks:
+    - file:
+          path: /home/vagrant
+          owner: vagrant
+          group: vagrant
+          recurse: true
+          state: directory
 
